@@ -30,6 +30,11 @@ public class LoanController {
         }
         return ResponseEntity.badRequest().body("Create Loan fail");
     }
+    @GetMapping("/reader/{id}")
+    public ResponseEntity<?> getLoanReaderById(@PathVariable(name = "id") @ReaderIdExists int id){
+        List<LoanDto> Dto = loanService.getLoanReaderById(id);
+        return ResponseEntity.ok(new BaseResponse(HttpStatus.OK.value(), Dto,"Get Loan id = " + id + " complete"));
+    }
     @GetMapping
     public ResponseEntity<BaseResponse> getAllLoans(){
         List<LoanDto> LoanDtoList = loanService.getAllLoans();

@@ -17,4 +17,6 @@ public interface LoanService {
     boolean editLoanById(int id, LoanDto loanDto);
 
     String deleteLoanById(int id);
+
+    List<LoanDto> getLoanReaderById(int id);
 }

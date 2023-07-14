@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface ReaderRepository extends JpaRepository<Reader,Integer> {
-    Optional<Reader> findReadersByEmailAndActive(String s, boolean active);
+    Optional<Reader> findReaderByEmailAndActive(String s, boolean active);
     boolean existsReaderByIdAndActive(int id,boolean active);
     Reader getReaderById(int Id);
 }

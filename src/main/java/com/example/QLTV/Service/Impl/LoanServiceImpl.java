@@ -63,13 +63,7 @@ public class LoanServiceImpl implements LoanService {
         List<Loan> loanList = loanRepository.findAll();
         List<LoanDto> loanDtoList = new ArrayList<>();
         for (Loan temp: loanList) {
-            LoanDto loanDto = new LoanDto();
-            loanDto.setId(temp.getId());
-            loanDto.setReaderName(readerRepository.getReaderById(temp.getReader().getId()).getName());
-            loanDto.setBookTitle(bookRepository.getBookById(temp.getBook().getId()).getTitle());
-            loanDto.setLoanDate(String.valueOf(temp.getLoanDate()));
-            loanDto.setDueDate(String.valueOf(temp.getDueDate()));
-            loanDto.setReturned(String.valueOf(temp.isReturned()));
+            LoanDto loanDto = toDTO(temp);
             loanDtoList.add(loanDto);
         }
         logger.info("Get All Loans");
@@ -79,15 +73,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public LoanDto getLoanById(int id) {
         Loan loan = loanRepository.getLoanById(id);
-        LoanDto Dto = new LoanDto();
-        Dto.setId(loan.getId());
-        Dto.setReaderName(readerRepository.getReaderById(loan.getReader().getId()).getName());
-        Dto.setBookTitle(bookRepository.getBookById(loan.getBook().getId()).getTitle());
-        Dto.setLoanDate(String.valueOf(loan.getLoanDate()));
-        Dto.setDueDate(String.valueOf(loan.getDueDate()));
-        Dto.setReturned(String.valueOf(loan.isReturned()));
-        logger.info("Get Loan" + id);
-        return Dto;
+        return toDTO(loan);
     }
 
     @Override
@@ -122,5 +108,28 @@ public class LoanServiceImpl implements LoanService {
         loanRepository.deleteById(id);
         logger.info("Delete loan complete");
         return "Delete Success";
+    }
+
+    @Override
+    public List<LoanDto> getLoanReaderById(int id) {
+        List<Loan> loans = loanRepository.findLoansByReaderId(id);
+        List<LoanDto> list = new ArrayList<>();
+        loans.forEach(loan -> {
+            LoanDto dto = toDTO(loan);
+            list.add(dto);
+        });
+
+        logger.info("Get Loans reader by Id " + id);
+        return list;
+    }
+    private LoanDto toDTO(Loan loan){
+        LoanDto temp = new LoanDto();
+        temp.setId(loan.getId());
+        temp.setReaderName(readerRepository.getReaderById(loan.getReader().getId()).getName());
+        temp.setBookTitle(bookRepository.getBookById(loan.getBook().getId()).getTitle());
+        temp.setLoanDate(String.valueOf(loan.getLoanDate()));
+        temp.setDueDate(String.valueOf(loan.getDueDate()));
+        temp.setReturned(String.valueOf(loan.isReturned()));
+        return temp;
     }
 }

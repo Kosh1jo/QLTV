@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,6 +29,8 @@ public class ReaderServiceImpl implements ReaderService {
     TokenRepository tokenRepository;
     @Autowired
     EmailService emailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public String verifyToken(String token) {
@@ -53,6 +56,7 @@ public class ReaderServiceImpl implements ReaderService {
         Reader reader = readerConvert.toEntity(readerDto);
         reader.setActive(false);
         reader.setRoles(Role.USER);
+        reader.setPassword(passwordEncoder.encode(readerDto.getPassword()));
         Reader readerSave = readerRepository.save(reader);
         generateToken(reader);
     }
@@ -69,7 +73,7 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public boolean isEmailExists(String s) {
-        Optional<Reader> reader = readerRepository.findReadersByEmailAndActive(s, true);
+        Optional<Reader> reader = readerRepository.findReaderByEmailAndActive(s, true);
         return (long) reader.stream().toList().size() > 1;
     }
 
@@ -117,7 +121,7 @@ public class ReaderServiceImpl implements ReaderService {
         signUpToken.setExpirationTime(new Date());
         tokenRepository.save(signUpToken);
         try {
-            emailService.sendEmail(reader.getEmail(), "Please active your account", "localhost:8090/api/readers/verify/" + token);
+            emailService.sendEmail(reader.getEmail(), "Please active your account", "localhost:8090/api/auth/verify/" + token);
         } catch (Exception e) {
             logger.error("Send email failed");
             throw e;
