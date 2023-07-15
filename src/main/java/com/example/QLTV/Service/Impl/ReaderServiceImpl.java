@@ -55,7 +55,7 @@ public class ReaderServiceImpl implements ReaderService {
     public void signUp(ReaderDto readerDto) {
         Reader reader = readerConvert.toEntity(readerDto);
         reader.setActive(false);
-        reader.setRoles(Role.USER);
+        reader.setRoles(readerDto.getRoles());
         reader.setPassword(passwordEncoder.encode(readerDto.getPassword()));
         Reader readerSave = readerRepository.save(reader);
         generateToken(reader);
